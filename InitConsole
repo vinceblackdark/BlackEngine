@@ -1,0 +1,55 @@
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using static System.Console;
+namespace MayaEngine
+{
+    public static partial class InitConsole
+    {
+        [DllImport("kernel32.dll", ExactSpelling = true)]
+        private static extern IntPtr GetConsoleWindow();
+        private static IntPtr MayaEngineConsole = GetConsoleWindow();
+
+        [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
+        private static extern IntPtr SetWindowPos(IntPtr hwnd, int hwndInsertAfter, int x, int y, int cx, int cy, int wFlags);
+        private const int SW_HIDE = 0; private const int SW_RESTORE = 9;
+        private const int SW_MINIMIZE = 6; private const int SW_MAXIMIZE = 3;
+        private const int SWP_NOSIZE = 0x0001;
+
+        public static void DisplayMid() 
+        {
+            SetWindowSize(144, 32);
+            SetBufferSize(144, 32);
+            CursorVisible = false;
+        }
+        public static void DisplaySmall()
+        {
+            SetWindowSize(100, 28);
+            SetBufferSize(100, 28);
+            CursorVisible = false;
+        }
+        public static void SetDisplay(int width, int height)
+        {
+            SetWindowSize(width, height);
+            SetBufferSize(width, height);
+            CursorVisible = false;
+        }
+
+        public static void Maximize()
+        {
+            Process p = Process.GetCurrentProcess();
+            InitConsoleHelpers.ShowWindow(p.MainWindowHandle, 3); //SW_MAXIMIZE = 3
+            SetWindowPos(MayaEngineConsole, 0, 0, 0, 0, 0, SWP_NOSIZE);
+#pragma warning disable CA1416 // Validate platform compatibility
+            SetWindowSize(LargestWindowWidth, LargestWindowHeight);
+#pragma warning restore CA1416 // Validate platform compatibility
+            SetCursorPosition(0, 0);
+            CursorVisible = false;
+        }
+    }
+    public static partial class InitConsoleHelpers
+    {
+        [LibraryImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool ShowWindow(IntPtr hwnd, int nCmdShow);
+    }
+}
