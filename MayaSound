@@ -1,0 +1,126 @@
+using System.Media;
+namespace MayaEngine
+{
+    public class MayaSound
+    {
+        private SoundLoader _soundLoader;
+        private SoundPlayer mayaPlayer;
+
+        private Thread threadPlay;
+        private bool isPlaying, isLoop;
+
+        private string _soundFile { get; set; }
+        private string _sound { get; set; }
+        public MayaSound(string soundfile, bool isLoop)
+        {
+            this.isLoop = isLoop;
+            _soundFile = soundfile;
+            _soundLoader = new SoundLoader(_soundFile);
+            _sound = _soundLoader.GetAudio();
+#pragma warning disable CA1416 // Validate platform compatibility
+            mayaPlayer = new SoundPlayer(_sound);
+#pragma warning restore CA1416 // Validate platform compatibility
+            threadPlay = new Thread(() => { }); threadPlay.IsBackground = true;
+        }
+
+        public void Play()
+        {
+            if (isPlaying)
+            {
+                if (!this.isLoop) { Stop(); } else { return; }
+            }
+            threadPlay = new Thread(() =>
+            {
+                if (string.IsNullOrEmpty(_sound)) { return; }
+                try
+                {
+                    if (this.isLoop)
+                    {
+#pragma warning disable CA1416 // Validate platform compatibility
+                        mayaPlayer.SoundLocation = _sound;
+#pragma warning restore CA1416 // Validate platform compatibility
+#pragma warning disable CA1416 // Validate platform compatibility
+                        mayaPlayer.Load();
+#pragma warning restore CA1416 // Validate platform compatibility
+                        isPlaying = true;
+#pragma warning disable CA1416 // Validate platform compatibility
+                        mayaPlayer.PlayLooping();
+#pragma warning restore CA1416 // Validate platform compatibility
+                    }
+                    else
+                    {
+#pragma warning disable CA1416 // Validate platform compatibility
+                        mayaPlayer.SoundLocation = _sound;
+#pragma warning restore CA1416 // Validate platform compatibility
+#pragma warning disable CA1416 // Validate platform compatibility
+                        mayaPlayer.LoadAsync();
+#pragma warning restore CA1416 // Validate platform compatibility
+                        isPlaying = true;
+#pragma warning disable CA1416 // Validate platform compatibility
+                        mayaPlayer.Play();
+#pragma warning restore CA1416 // Validate platform compatibility
+                        isPlaying = false;
+                    }
+                }
+                catch (FileNotFoundException) { return; }
+                catch (DirectoryNotFoundException) { return; }
+                catch (IOException) { return; }
+                catch { return; }
+            }); threadPlay.IsBackground = true; threadPlay.Start();
+        }
+        public void Stop()
+        {
+#pragma warning disable CA1416 // Validate platform compatibility
+            isPlaying = false; mayaPlayer.Stop();
+#pragma warning restore CA1416 // Validate platform compatibility
+        }
+    }
+
+    public class SoundLoader
+    {
+        private SoundManager sounds;
+        private string _name { get; set; }
+        public SoundLoader(string name)
+        {
+            _name = name;
+            sounds = new SoundManager();
+        }
+        public string GetAudio()
+        {
+            return sounds.GetAudioFile(_name);
+        }
+    }
+    public class SoundManager
+    {
+        private const string soundPathUI = @"Resources\Sounds\uisounds";
+        private const string soundPathBG = @"Resources\Sounds\bgsounds";
+        private const string soundPathMusic = @"Resources\Sounds\tracks";
+
+        private Dictionary<string, string> _audioFiles;
+        public SoundManager()
+        {
+            _audioFiles = new Dictionary<string, string>();
+            LoadAudioFiles(soundPathUI);
+            LoadAudioFiles(soundPathBG);
+            LoadAudioFiles(soundPathMusic);
+        }
+        public void LoadAudioFiles(string directoryPath)
+        {
+            var files = Directory.GetFiles(directoryPath, "*.wav");
+
+            foreach (var file in files)
+            {
+                var name = Path.GetFileNameWithoutExtension(file);
+                _audioFiles.Add(name, file);
+            }
+        }
+        public string GetAudioFile(string name)
+        {
+            if (_audioFiles.ContainsKey(name))
+            {
+                return _audioFiles[name];
+            }
+            return name;
+        }
+    }
+}
