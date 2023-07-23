@@ -1,0 +1,58 @@
+namespace MayaEngine
+{
+    public static class Resources
+    {
+        private const string ResourcesSprites = @"Resources\Ascii\Sprites\";
+        private const string ResourcesTiles = @"Resources\Ascii\Tiles\";
+        private const string ResourcesAnimationSprites = @"Resources\Ascii\AnimationSprites\";
+        private const string ResourcesFrames = @"Resources\Ascii\Frames\";
+        private const string ResourcesText = @"Resources\Text\";
+
+        public static string[] GetTileArray(string tile)
+        {
+            return File.ReadAllLines(ResourcesTiles + tile + ".txt");
+        }
+
+        public static string[] GetSpriteArray(string sprite)
+        {
+            return File.ReadAllLines(ResourcesSprites + sprite + ".txt");
+        }
+
+        public static string GetSprite(string sprite)
+        {
+            return File.ReadAllText(ResourcesSprites + sprite + ".txt");
+        }
+
+        public static string[] GetAnimationSpriteArray(string sprite)
+        {
+            return File.ReadAllLines(ResourcesAnimationSprites + sprite + ".txt");
+        }
+
+        public static string GetAnimationSprite(string sprite)
+        {
+            return File.ReadAllText(ResourcesAnimationSprites + sprite + ".txt");
+        }
+
+        public static string[] GetFrameArray(string frame)
+        {
+            return File.ReadAllLines(ResourcesFrames + frame + ".txt");
+        }
+
+        public static string GetFrame(string frame)
+        {
+            return File.ReadAllText(ResourcesFrames + frame + ".txt");
+        }
+
+        public static string GetText(string text)
+        {
+            if (!File.Exists(ResourcesText + text + ".txt")) { return "no_file_found"; }
+            return File.ReadAllText(ResourcesText + text + ".txt");
+        }
+
+        public static string[]? GetTextArray(string text)
+        {
+            if (!File.Exists(ResourcesText + text + ".txt")) { return null; }
+            return File.ReadAllLines(ResourcesText + text + ".txt");
+        }
+    }
+}
