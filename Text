@@ -1,0 +1,15 @@
+using static MayaEngine.Resources;
+namespace MayaEngine
+{
+    public class Text
+    {
+        public string[] _Text { get; set; }
+        public string _TextFile { get; set; }
+
+        public Text(string textfile)
+        {
+            _TextFile = textfile;
+            _Text = GetTextArray(_TextFile);
+        }
+    }
+}
