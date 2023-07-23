@@ -1,0 +1,123 @@
+using Pastel;
+using System.Drawing;
+using static System.Console;
+namespace MayaEngine
+{
+    public static class Render
+    {
+        public static void WriteString(int posX, int posY, string value)
+        {
+            SetCursorPosition(posX, posY);
+            Write(value);
+        }
+        public static void WriteStringArray(int posX, int posY, string[] value)
+        {
+            SetCursorPosition(posX, posY++);
+            foreach (string s in value)
+            {
+                WriteLine(s);
+                SetCursorPosition(posX, posY++);
+            }
+        }
+        public static void WriteStringPastel(int posX, int posY, string value, Color color)
+        {
+            ConsoleExtensions.Enable();
+            SetCursorPosition(posX, posY);
+            Write(ConsoleExtensions.Pastel(value, color));
+            ConsoleExtensions.Disable();
+        }
+        public static void WriteStringPastelBg(int posX, int posY, string value, Color color)
+        {
+            ConsoleExtensions.Enable();
+            SetCursorPosition(posX, posY);
+            Write(ConsoleExtensions.PastelBg(value, color));
+            ConsoleExtensions.Disable();
+        }
+        public static void WriteCharPastel(int posX, int posY, char value, Color color)
+        {
+            WriteStringPastel(posX, posY, value.ToString(), color);
+        }
+        public static void WriteCharPastelBg(int posX, int posY, char value, Color color)
+        {
+            WriteStringPastelBg(posX, posY, value.ToString(), color);
+        }
+        public static void WriteStringArrayPastel(int posX, int posY, string[] value, Color color)
+        {
+            ConsoleExtensions.Enable();
+            SetCursorPosition(posX, posY++);
+            foreach (string s in value)
+            {
+                WriteLine(ConsoleExtensions.Pastel(s, color));
+                SetCursorPosition(posX, posY++);
+            }
+            ConsoleExtensions.Disable();
+        }
+        public static void WriteStringArrayPastelBg(int posX, int posY, string[] value, Color color)
+        {
+            ConsoleExtensions.Enable();
+            SetCursorPosition(posX, posY++);
+            foreach (string s in value)
+            {
+                WriteLine(ConsoleExtensions.PastelBg(s, color));
+                SetCursorPosition(posX, posY++);
+            }
+            ConsoleExtensions.Disable();
+        }
+
+
+        public static void WriteColordCharsArray(int posX, int posY, string[] value, List<char> chars, List<Color> colors)
+        {
+            if (chars.Count != colors.Count) { return; }
+            ConsoleExtensions.Enable();
+            SetCursorPosition(posX, posY);
+            foreach (string s in value)
+            {
+                foreach (char c in s)
+                {
+                    bool isMatch = false;
+                    for (int i = 0; i < chars.Count; i++)
+                    {
+                        if (c == chars[i])
+                        {
+                            Write(ConsoleExtensions.Pastel(c.ToString(), colors[i]));
+                            isMatch = true;
+                            break;
+                        }
+                    }
+                    if (!isMatch)
+                    {
+                        Write(c);
+                    }
+                }
+                SetCursorPosition(posX, posY++);
+            }
+        }
+        public static void WriteColordCharsArrayBg(int posX, int posY, string[] value, List<char> chars, List<Color> colors)
+        {
+            if (chars.Count != colors.Count) { return; }
+            ConsoleExtensions.Enable();
+            SetCursorPosition(posX, posY);
+            foreach (string s in value)
+            {
+                foreach (char c in s)
+                {
+                    bool isMatch = false;
+                    for (int i = 0; i < chars.Count; i++)
+                    {
+                        if (c == chars[i])
+                        {
+                            Write(ConsoleExtensions.PastelBg(c.ToString(), colors[i]));
+                            isMatch = true;
+                            break;
+                        }
+                    }
+                    if (!isMatch)
+                    {
+                        Write(c);
+                    }
+                }
+                SetCursorPosition(posX, posY++);
+            }
+        }
+    }
+}
