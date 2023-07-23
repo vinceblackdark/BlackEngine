@@ -1,0 +1,156 @@
+using System.Drawing;
+using static System.Drawing.Color;
+namespace MayaEngine
+{
+    public interface ISettingsManager
+    {
+        public void SaveSettings();
+        public void LoadSettings();
+    }
+
+    public class SettingsManager : ISettingsManager
+    {
+        private const string SettingsSavePath = @"Settings\settings.sav";
+
+        private string[] settingsSave = new string[7];
+
+        private const int setUISound = 0;
+        private const int setBGSound = 1;
+        private const int setMusicSound = 2;
+        private const int setLanguage = 3;
+        private const int setColorFrame = 4;
+        private const int setAnimation = 5;
+        private const int setTypeSound = 6;
+
+        public bool isUISound { get; set; } = true;
+        public bool isMusic { get; set; } = false;
+        public bool isBackground { get; set; } = false;
+        public int Language { get; set; } = 0;
+        public Color mainColor { get; set; } = AntiqueWhite;
+        public bool isAnimation { get; set; } = true;
+        public bool isTypingSound { get; set; } = true;
+
+        public string mainTitle { get; set; } = "Maya Engine";
+
+        public SettingsManager()
+        {
+            if (File.Exists(SettingsSavePath))
+            {
+                LoadSettings();
+            }
+            else
+            {
+                SaveSettings();
+            }
+        }
+
+        #region get and update options
+
+        public void UpdateTitle(string title)
+        {
+            mainTitle = title;
+        }
+        public string ReturnTitle()
+        {
+            return mainTitle;
+        }
+        public Color ReturnSettingsColor()
+        {
+            return mainColor;
+        }
+        public void UpdateSettingsColor(Color color)
+        {
+            mainColor = color;
+            SaveSettings();
+        }
+        public bool ReturnisUISound()
+        {
+            return isUISound;
+        }
+        public void UpdateisUISound(bool update)
+        {
+            isUISound = update;
+            SaveSettings();
+        }
+        public bool ReturnisMusic()
+        {
+            return isMusic;
+        }
+        public void UpdateisMusic(bool update)
+        {
+            isMusic = update;
+            SaveSettings();
+        }
+        public bool ReturnisTypingSound()
+        {
+            return isTypingSound;
+        }
+        public void UpdateisTypingSound(bool update)
+        {
+            isTypingSound = update;
+            SaveSettings();
+        }
+        public bool ReturnisBGSound()
+        {
+            return isBackground;
+        }
+        public void UpdateisBGSound(bool update)
+        {
+            isBackground = update;
+            SaveSettings();
+        }
+        public bool ReturnisAnimation()
+        {
+            return isAnimation;
+        }
+        public void UpdateisAnimation(bool update)
+        {
+            isAnimation = update;
+            SaveSettings();
+        }
+        public void UpdateLanguage(int lang)
+        {
+            switch (lang)
+            {
+                case 0:
+                    Language = lang;
+                    break;
+                case 1:
+                    Language = lang;
+                    break;
+            }
+        }
+        public int ReturnLanguage()
+        {
+            return Language;
+        }
+
+        #endregion get and update options
+
+        public void SaveSettings()
+        {
+            File.Delete(SettingsSavePath);
+            string[] saveSettings = new string[settingsSave.Length];
+            saveSettings[setUISound] = isUISound.ToString();
+            saveSettings[setBGSound] = isBackground.ToString();
+            saveSettings[setMusicSound] = isMusic.ToString();
+            saveSettings[setLanguage] = Language.ToString();
+            saveSettings[setColorFrame] = mainColor.ToArgb().ToString();
+            saveSettings[setAnimation] = isAnimation.ToString();
+            saveSettings[setTypeSound] = isTypingSound.ToString();
+            File.WriteAllLines(SettingsSavePath, saveSettings);
+        }
+        public void LoadSettings()
+        {
+            string[] getSettings = File.ReadAllLines(SettingsSavePath);
+            isUISound = Convert.ToBoolean(getSettings[setUISound]);
+            isBackground = Convert.ToBoolean(getSettings[setBGSound]);
+            isMusic = Convert.ToBoolean(getSettings[setMusicSound]);
+            Language = Convert.ToInt32(getSettings[setLanguage]);
+            mainColor = FromArgb(Convert.ToInt32(getSettings[setColorFrame]));
+            isAnimation = Convert.ToBoolean(getSettings[setAnimation]);
+            isTypingSound = Convert.ToBoolean(getSettings[setTypeSound]);
+        }
+
+    }
+}
