@@ -1,0 +1,137 @@
+using System.Drawing;
+using static System.Drawing.Color;
+using static System.Console;
+using Pastel;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace MayaEngine
+{ 
+    public class TypingText
+    {
+        
+        private MayaSound typingSound = new MayaSound("perc3", false);
+        private string clearString = "                                     ";
+        private List<Text> textlist;
+        private bool _isIdle;
+        public int textSpeed { get; set; } = 100;
+        public char[] idleChars { get; set; } = { '▲', '►', '▼', '◄' };
+        public string _text { get; set; } = "next";
+        public Color textColor { get; set; } = Orange;
+        public Color charColor { get; set; } = Red;
+
+        // need to create one Text 
+        public TypingText(string textFile, bool isIdle, int textspeed)
+        {
+            textlist = new List<Text>();
+            textSpeed = textspeed;
+            _isIdle = isIdle;
+            Text text = new Text(textFile);
+            textlist.Add(text);
+        }
+        
+        // need to create one Text
+        public TypingText(Text text, bool isIdle, int textspeed)
+        {
+            textlist = new List<Text>();
+            textSpeed = textspeed;
+            _isIdle = isIdle;
+            textlist.Add(text);
+        }
+        public TypingText(Text[] text, bool isIdle, int textspeed)
+        {
+            textlist = new List<Text>();
+            textSpeed = textspeed;
+            _isIdle = isIdle;
+            foreach(Text t in text)
+            {
+                textlist.Add(t);
+            }
+        }
+        // need to create a list of texts
+        public TypingText(List<Text> texts, bool isIdle, int textspeed)
+        {
+            textlist = new List<Text>();
+            textSpeed = textspeed;
+            _isIdle = isIdle;
+            foreach (Text text in texts)
+            {
+                textlist.Add(text);
+            }
+        }
+
+        // For many texts, need to create a List of Text arrays 
+        public TypingText(List<Text[]> textArray, bool isIdle, int textspeed)
+        {
+            textlist = new List<Text>();
+            textSpeed = textspeed;
+            _isIdle = isIdle;
+
+            foreach (Text[] text in textArray)
+            {
+                foreach(Text t in text)
+                {
+                    textlist.Add(t);
+                }
+            }
+        }
+
+        public void DrawAllText(int posx, int posy)
+        {
+            int index = 0;
+            for (int i = 0; i < textlist.Count; i++)
+            { 
+                DrawText(posx, posy, index);
+                if(_isIdle) { IdleNext(idleChars, _text, textColor, charColor, posx, posy + 1);  }
+                index++;
+                ClearOldText(posx, posy); 
+                if (index == textlist.Count) { ReadKey(true); break; }
+                if (KeyAvailable) { ReadKey(true); break; }
+            }
+        
+        }
+        private void DrawText(int posx, int posy, int index)
+        {
+            Text text = textlist[index];
+            string[] _text = text._Text;
+
+            SetCursorPosition(posx, posy);
+            foreach(string s in _text)
+            {
+                foreach (char c in s)
+                {
+                    Write(c);
+                    typingSound.Play();
+                    Thread.Sleep(textSpeed);
+                    if (_isIdle) 
+                    {
+                        SetCursorPosition(posx, posy);
+                        Write(s);
+                        break;
+                    }
+                }
+            }
+            if(!_isIdle) { ReadKey(true); }
+        }
+
+        private void ClearOldText(int posx, int posy)
+        {
+            SetCursorPosition(posx, posy);
+            Write(clearString);
+        }
+        private void IdleNext(char[] animationChars, string text, Color txtColor, Color charColor, int posX, int posY)
+        {
+            CursorVisible = false;
+            while (true)
+            {
+                foreach (char c in animationChars)
+                {
+                    SetCursorPosition(posX, posY);
+                    Write(ConsoleExtensions.Pastel(text, txtColor) + " " + ConsoleExtensions.Pastel(c.ToString(), charColor));
+                    Thread.Sleep(textSpeed);
+                    if (KeyAvailable) { break; }
+                }
+                if (KeyAvailable) { break; }
+            }
+        }
+    }
+}
